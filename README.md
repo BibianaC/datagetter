@@ -1,5 +1,7 @@
 # 360Giving Data Getter
 
+*Notice* - this script can only run on UNIX 
+
 Install dependencies:
 
 ```
