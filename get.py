@@ -33,7 +33,7 @@ acceptable_licenses = [
 unacceptable_licenses = [
     '',
     # Not relicenseable as CC-BY
-    'https://www.nationalarchives.gov.uk/doc/open-government-licence/version/1/', 
+    'https://www.nationalarchives.gov.uk/doc/open-government-licence/version/1/',
     'https://creativecommons.org/licenses/by-nc/4.0/',
     'https://creativecommons.org/licenses/by-nc-sa/4.0/',
 ]
@@ -44,8 +44,12 @@ CONTENT_TYPE_MAP = {
     'text/csv': 'csv'
 }
 
-schema = json.loads(requests.get('https://raw.githubusercontent.com/ThreeSixtyGiving/standard/master/schema/360-giving-package-schema.json').text)
+def test_schema():
+    with open('test_schema/360-giving-package-schema.json') as schema_file:
+        schema = json.load(schema_file)
+        return schema
 
+schema = test_schema()
 
 def datetime_or_date(instance):
     result = strict_rfc3339.validate_rfc3339(instance)
@@ -79,7 +83,7 @@ def convert_spreadsheet(input_path, converted_path, file_type):
         input_format=file_type,
         root_list_path='grants',
         root_id='',
-        schema='https://raw.githubusercontent.com/ThreeSixtyGiving/standard/master/schema/360-giving-schema.json',
+        schema='test_schema/360-giving-schema.json',
         convert_titles=True,
         encoding=encoding
     )
@@ -90,7 +94,7 @@ if args.download:
         fp.write(r.text)
     data_all = r.json()
 else:
-    data_all = json.load(open('data/data_all.json')) 
+    data_all = json.load(open('data/data_all.json'))
 
 data_valid = []
 data_acceptable_license = []
@@ -138,7 +142,7 @@ for dataset in data_all:
     json_file_name = 'data/json_all/{}.json'.format(dataset['identifier'])
 
     if args.convert:
-        if file_type == 'json': 
+        if file_type == 'json':
             os.link(file_name, json_file_name)
             metadata['json'] = json_file_name
         else:
@@ -170,7 +174,7 @@ for dataset in data_all:
                 metadata['valid'] = False
             else:
                 metadata['valid'] = True
-        
+
         if metadata['valid']:
             os.link(json_file_name, 'data/json_valid/{}.json'.format(dataset['identifier']))
             data_valid.append(dataset)
