@@ -2,10 +2,11 @@ import json
 import glob
 import optparse
 import requests
+import re
 
 from jsonschema import Draft3Validator
 
-schema = json.loads(requests.get('https://raw.githubusercontent.com/ThreeSixtyGiving/standard/master/schema/360-giving-schema.json').text)
+schema = json.loads(requests.get('https://raw.githubusercontent.com/ThreeSixtyGiving/standard/additionalFieldsFalse/schema/360-giving-schema.json').text)
 
 usage = 'Usage: %prog [ --all --cont ]'
 parser = optparse.OptionParser(usage=usage)
@@ -101,7 +102,6 @@ def remove_extra_fields(data, schema, IS_VERBOSE):
                 for unwanted_property in unwanted_properties:
                     if unwanted_property in temp:
                         del temp[unwanted_property]
-
     return data, has_extra_fields
 
 with open('output.jsonl', 'w') as writefile:
@@ -109,10 +109,7 @@ with open('output.jsonl', 'w') as writefile:
         with open(filename,"r") as data_all:
             data = json.loads(data_all.read())
             for grant in data['grants']:
-                has_extra_fields = True
-                while has_extra_fields:
-                    grant, has_extra_fields = remove_extra_fields(
-                        grant, schema, 'true')
+                grant, has_extra_fields = remove_extra_fields(grant, schema, 'True')
                 json.dump(grant, writefile)
                 writefile.write('\n')
                 print(".",end='')
